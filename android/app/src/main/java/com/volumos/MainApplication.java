@@ -1,4 +1,4 @@
-package com.volomos;
+package com.volumos;
 
 import android.app.Application;
 import android.util.Log;
