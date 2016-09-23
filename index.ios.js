@@ -53,7 +53,7 @@ class ZoneController extends Component {
   }
 }
 
-class Volomos extends Component {
+class Volumos extends Component {
   constructor(props) {
     super(props)
 
@@ -143,4 +143,4 @@ const styles = StyleSheet.create({
   }
 })
 
-AppRegistry.registerComponent('Volomos', () => Volomos)
+AppRegistry.registerComponent('Volumos', () => Volumos)
