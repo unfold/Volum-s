@@ -3,10 +3,10 @@ import { throttle } from 'lodash'
 import {
   StyleSheet,
   Text,
-  TextInput,
   View,
 } from 'react-native'
 
+import HostInput from './HostInput'
 import Zone from './Zone'
 import { fetchStatus, setActive, setVolume } from '../utils/api'
 
@@ -55,12 +55,7 @@ export default class extends Component {
       <View style={styles.container}>
         <Text style={styles.title}>VOLUMÖS</Text>
 
-        <TextInput
-          style={styles.host}
-          onChangeText={value => this.setState({ host: value })}
-          value={this.state.host}
-        />
-
+        <HostInput host={host} setHost={value => this.setState({ host: value })} />
         <Zone id="ZONE1" title="Kitchen" {...zoneProps} />
         <Zone id="ZONE2" title="Workspace" {...zoneProps} />
       </View>
