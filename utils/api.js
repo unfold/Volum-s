@@ -2,6 +2,17 @@ import parseXML from 'xml-parser'
 import { trim } from 'lodash'
 import request from './request'
 
+const MIN_VOLUME = -80
+const MAX_VOLUME = 18
+
+const normalizeVolume = value => (
+  value === '--' ? 0 : (parseFloat(value) - MIN_VOLUME) / (MAX_VOLUME - MIN_VOLUME)
+)
+
+const denormalizeVolume = value => (
+  Math.round((value * (MAX_VOLUME - MIN_VOLUME)) + MIN_VOLUME)
+)
+
 const transformValue = value => trim(value) || null
 const transformChildren = children => (
   children.length > 1 ? children.reduce((result, { attributes, content }) => ({
@@ -19,24 +30,20 @@ const transformXML = document => (
 
 export const sendCommand = (host, zone, command, argument) => {
   const url = `http://${host}/MainZone/index.put.asp`
-  const query = {
-    cmd0: `${command}/${argument || ''}`,
-    cmd1: 'aspMainZone_WebUpdateStatus/',
+  const data = {
+    cmd0: `${command}/${argument}`,
     ZoneName: zone,
   }
 
-  return request({ url, query, method: 'PUT' })
+  console.log(`Sending command: ${command}(${argument}) to ${zone}`)
+
+  return request({ url, data, method: 'POST' })
     .then(response => response.text())
-    .then(text => {
-      console.log('Received command response:', text)
-    })
 }
 
-// MainZone/index.put.asp?cmd0=PutMasterVolumeSet%2F-30.0&ZoneName=ZONE2
 export const setVolume = (host, zone, volume) =>
-  sendCommand(host, zone, 'PutMasterVolumeSet', volume)
+  sendCommand(host, zone, 'PutMasterVolumeSet', denormalizeVolume(volume))
 
-// MainZone/index.put.asp?cmd0=PutZone_OnOff%2FON&cmd1=aspMainZone_WebUpdateStatus%2F&ZoneName=ZONE2
 export const setActive = (host, zone, active) =>
   sendCommand(host, zone, 'PutZone_OnOff', active ? 'ON' : 'OFF')
 
@@ -50,8 +57,9 @@ export const fetchStatus = (host, zone = 'ZONE1') => {
     .then(response => response.text())
     .then(parseXML)
     .then(transformXML)
-    .then(({ MasterVolume, ZonePower }) => ({
-      volume: parseFloat(MasterVolume) / (130 - 80),
+    .then(({ MasterVolume, RenameZone, ZonePower }) => ({
+      name: RenameZone,
+      volume: normalizeVolume(MasterVolume),
       active: ZonePower === 'ON',
     }))
 }

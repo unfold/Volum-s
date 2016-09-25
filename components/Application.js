@@ -7,7 +7,7 @@ import {
 } from 'react-native'
 
 import HostInput from './HostInput'
-import Zone from './Zone'
+import ZoneContainer from './ZoneContainer'
 import { fetchStatus, setActive, setVolume } from '../utils/api'
 
 const styles = StyleSheet.create({
@@ -46,9 +46,9 @@ export default class extends Component {
     const { host } = this.state
 
     const zoneProps = {
-      fetchStatus: id => fetchStatus(host, id),
-      setActive: (id, active) => setActive(host, id, active),
-      setVolume: throttle((id, volume) => setVolume(host, id, volume), 50),
+      fetchStatus: zone => fetchStatus(host, zone),
+      setActive: (zone, active) => setActive(host, zone, active),
+      setVolume: throttle((zone, volume) => setVolume(host, zone, volume), 250, { leading: false }),
     }
 
     return (
@@ -56,8 +56,8 @@ export default class extends Component {
         <Text style={styles.title}>VOLUMÖS</Text>
 
         <HostInput host={host} setHost={value => this.setState({ host: value })} />
-        <Zone id="ZONE1" title="Kitchen" {...zoneProps} />
-        <Zone id="ZONE2" title="Workspace" {...zoneProps} />
+        <ZoneContainer id="ZONE1" {...zoneProps} />
+        <ZoneContainer id="ZONE2" {...zoneProps} />
       </View>
     )
   }

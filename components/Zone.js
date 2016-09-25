@@ -1,4 +1,4 @@
-import React, { Component, PropTypes } from 'react'
+import React, { PropTypes } from 'react'
 import {
   Slider,
   StyleSheet,
@@ -31,61 +31,31 @@ const styles = StyleSheet.create({
   },
 })
 
-export default class extends Component {
-  static propTypes = {
-    id: PropTypes.string.isRequired,
-    title: PropTypes.string.isRequired,
-    fetchStatus: PropTypes.func.isRequired,
-    setActive: PropTypes.func.isRequired,
-    setVolume: PropTypes.func.isRequired,
-  }
+const Zone = ({ name, active, volume, setActive, setVolume }) => (
+  <View style={styles.container}>
+    <Text style={styles.title}>{name} {active ? '' : '(inactive)'}</Text>
+    <Text>Volume: {Math.round(volume * 100)}%</Text>
+    <View style={styles.controls}>
+      <Slider
+        style={styles.slider}
+        value={volume}
+        onValueChange={setVolume}
+      />
+      <Switch
+        style={styles.switch}
+        value={active}
+        onValueChange={setActive}
+      />
+    </View>
+  </View>
+)
 
-  constructor(props) {
-    super(props)
-
-    this.state = {
-      volume: 0,
-      active: false,
-    }
-  }
-
-  componentDidMount() {
-    const { id, fetchStatus } = this.props
-
-    fetchStatus(id).then(({ volume, active }) => this.setState({ volume, active }))
-  }
-
-  setVolume(volume) {
-    this.setState({ volume })
-    this.props.setVolume(volume)
-  }
-
-  setActive(active) {
-    this.setState({ active })
-    this.props.setActive(active)
-  }
-
-  render() {
-    const { title } = this.props
-    const { volume, active } = this.state
-
-    return (
-      <View style={styles.container}>
-        <Text style={styles.title}>{title} {active ? '' : '(inactive)'}</Text>
-        <Text>Volume: {Math.round(volume * 100)}%</Text>
-        <View style={styles.controls}>
-          <Slider
-            style={styles.slider}
-            value={volume}
-            onValueChange={value => this.setVolume(value)}
-          />
-          <Switch
-            style={styles.switch}
-            value={active}
-            onValueChange={value => this.setActive(value)}
-          />
-        </View>
-      </View>
-    )
-  }
+Zone.propTypes = {
+  name: PropTypes.string.isRequired,
+  active: PropTypes.bool.isRequired,
+  volume: PropTypes.number.isRequired,
+  setActive: PropTypes.func.isRequired,
+  setVolume: PropTypes.func.isRequired,
 }
+
+export default Zone
