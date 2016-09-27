@@ -9,7 +9,7 @@
     "lodash": "^4.16.1",
     "qs": "^6.2.1",
     "react": "15.3.2",
-    "react-native": "0.33.0",
+    "react-native": "^0.33.0",
     "react-native-zeroconf": "^0.5.2",
     "xml-parser": "^1.2.1"
   },

@@ -22,6 +22,10 @@ DerivedData
 *.xcuserstate
 project.xcworkspace
 
+# iOS
+*.jsbundle*
+
+
 # Android/IJ
 #
 *.iml
@@ -41,5 +45,4 @@ android/app/libs
 android/keystores/debug.keystore
 
 fastlane/report.xml
-
 fastlane/README.md
