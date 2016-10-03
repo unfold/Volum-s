@@ -37,6 +37,8 @@ platform :ios do
     )
     pilot
 
+    # hockey(api_token: "83c08d27f42b40029b19655da43aef00")
+
     # sh "your_script.sh"
     # You can also use other beta testing services here (run `fastlane actions`)
   end
