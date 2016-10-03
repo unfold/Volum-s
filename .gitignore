@@ -43,6 +43,8 @@ buck-out/
 \.buckd/
 android/app/libs
 android/keystores/debug.keystore
+android/app/volumos.keystore # Simen has this locally
+android/google-play-key.json # Simen has this locally
 
 fastlane/report.xml
 fastlane/README.md
