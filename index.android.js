@@ -1,5 +1,5 @@
 import { AppRegistry } from 'react-native'
 
-import Application from './components/Application'
+import Volumos from './src'
 
-AppRegistry.registerComponent('Volumos', () => Application)
+AppRegistry.registerComponent('Volumos', () => Volumos)
