@@ -6,8 +6,9 @@ import { throttle } from 'lodash'
 import * as actions from '../actions'
 
 const Container = styled.View`
-  flex: 1 1 auto;
+  flex-grow: 1;
   align-items: center;
+  margin-bottom: 50;
 `
 
 const Track = styled.View`
@@ -16,7 +17,7 @@ const Track = styled.View`
   background-color: grey;
 `
 
-const Thumb = styled.View`
+const Thumb = styled(Animated.View)`
   height: 100;
   background-color: yellow;
 `
@@ -42,41 +43,56 @@ class Slider extends Component {
   constructor(props) {
     super(props)
 
-    const y = new Animated.Value(props.value)
+    const position = new Animated.Value(props.value)
     const panResponder = PanResponder.create({
       onStartShouldSetPanResponder: () => true,
 
       onPanResponderGrant: () => {
-        y.setOffset(y._value)
-        y.setValue(0)
+        position.setOffset(position._value) // eslint-disable-line: no-underscore-dangle
+        position.setValue(0)
       },
 
-      // onPanResponderMove: Animated.event(null, [{ dy: y }])
+      onPanResponderMove: Animated.event([null, { dy: position }]),
+      /*
       onPanResponderMove: (event, gestureState) => {
-        y.setValue(y._value + gestureState.dy)
+        position.setValue(gestureState.dy)
       },
+      */
 
       onPanResponderRelease: () => {
-        y.flattenOffset()
+        position.flattenOffset()
       },
     })
 
     this.state = {
-      y,
+      position,
       panResponder,
+      trackHeight: 100,
     }
+  }
+
+  onTrackLayout = ({ nativeEvent }) => {
+    this.setState({ trackHeight: nativeEvent.layout.height })
   }
 
   render() {
     const { title, value } = this.props
-    const { panResponder, y } = this.state
+    const { panResponder, position, trackHeight } = this.state
+    const range = [0, trackHeight - 100]
+
+    const translateY = position.interpolate({
+      inputRange: range,
+      outputRange: range,
+      extrapolate: 'clamp',
+    })
+
     const style = {
-      transform: [{ translateY: y }],
+      transform: [{ translateY }],
     }
 
     return (
-      <Track>
-        <Thumb style={style} {...panResponder.panHandlers}>
+      <Track onLayout={this.onTrackLayout}>
+        <Thumb style={style} onLayout={this.onThumbLayout} {...panResponder.panHandlers}>
           <Text>{title}</Text>
           <Text>{value}</Text>
           <Dot />
@@ -101,7 +117,7 @@ Zone.propTypes = {
   name: PropTypes.string.isRequired,
   active: PropTypes.bool.isRequired,
   volume: PropTypes.number.isRequired,
-  setActive: PropTypes.func.isRequired,
+  // setActive: PropTypes.func.isRequired,
   setVolume: PropTypes.func.isRequired,
 }
 
