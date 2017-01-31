@@ -1,96 +1,100 @@
 import React, { Component, PropTypes } from 'react'
-import { Animated, PanResponder, Slider, StyleSheet, Switch, Text, View } from 'react-native'
+import { Animated, PanResponder } from 'react-native'
+import styled from 'styled-components/native'
 import { connect } from 'react-redux'
 import { throttle } from 'lodash'
 import * as actions from '../actions'
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    flexGrow: 1,
-    alignItems: 'center',
-  },
+const Container = styled.View`
+  flex: 1 1 auto;
+  align-items: center;
+`
 
-  track: {
-    width: 100,
-    flexGrow: 1,
-    backgroundColor: 'grey',
-  },
+const Track = styled.View`
+  width: 100;
+  flex-grow: 1;
+  background-color: grey;
+`
 
-  thumb: {
-    height: 100,
-    // backgroundColor: 'yellow',
-  },
+const Thumb = styled.View`
+  height: 100;
+  background-color: yellow;
+`
 
-  dot: {
-    width: 10,
-    height: 10,
-    borderWidth: 0.5,
-    borderColor: 'white',
-    borderRadius: 5,
-  },
+const Dot = styled.View`
+  width: 10;
+  height: 10;
+  border-width: 0.5;
+  border-color: white;
+  border-radius: 5;
+`
 
-  text: {
-    color: 'white',
+const Text = styled.Text`
+  color: white;
+`
+
+class Slider extends Component {
+  static propTypes = {
+    title: PropTypes.string.isRequired,
+    value: PropTypes.number.isRequired,
   }
-})
 
-class Track extends Component {
   constructor(props) {
     super(props)
 
-    this.state = {
-      pan: new Animated.ValueXY(),
-    }
-  }
+    const y = new Animated.Value(props.value)
+    const panResponder = PanResponder.create({
+      onStartShouldSetPanResponder: () => true,
 
-  componentWillMount() {
-    this.panResponder = PanResponder.create({
-      onMoveShouldSetResponderCapture: () => true,
-      onMoveShouldSetPanResponderCapture: () => true,
-
-      onPanResponderGrant: (e, gestureState) => {
-        // Set the initial value to the current state
-        this.state.pan.setOffset({ y: this.state.pan.y._value })
-        this.state.pan.setValue({ x: 0, y: 0 })
+      onPanResponderGrant: () => {
+        y.setOffset(y._value)
+        y.setValue(0)
       },
 
-      // When we drag/pan the object, set the delate to the states pan position
-      onPanResponderMove: Animated.event([
-        null, { dx: this.state.pan.x, dy: this.state.pan.y },
-      ]),
+      // onPanResponderMove: Animated.event(null, [{ dy: y }])
+      onPanResponderMove: (event, gestureState) => {
+        y.setValue(y._value + gestureState.dy)
+      },
 
-      onPanResponderRelease: (e, { vx, vy }) => {
-        this.state.pan.flattenOffset()
+      onPanResponderRelease: () => {
+        y.flattenOffset()
       },
     })
+
+    this.state = {
+      y,
+      panResponder,
+    }
   }
 
   render() {
-    const { pan } = this.state
-
+    const { title, value } = this.props
+    const { panResponder, y } = this.state
     const style = {
-      transform: [{ translateY: pan.y }],
+      transform: [{ translateY: y }],
     }
 
     return (
-      <Animated.View style={[styles.thumb, style]} {...this.panResponder.panHandlers}>
-        {this.props.children}
-      </Animated.View>
+      <Track>
+        <Thumb style={style} {...panResponder.panHandlers}>
+          <Text>{title}</Text>
+          <Text>{value}</Text>
+          <Dot />
+        </Thumb>
+      </Track>
     )
   }
 }
 
-const Zone = ({ name, volume }) => (
-  <View style={styles.container}>
-    <View style={styles.track}>
-      <Track style={styles.thumb}>
-        <Text style={[styles.text, styles.volume]}>{volume}</Text>
-        <Text style={[styles.text, styles.name]}>{name}</Text>
-        <View style={styles.dot} />
-      </Track>
-    </View>
-  </View>
+const Zone = ({ active, name, volume, setVolume }) => (
+  <Container>
+    <Slider
+      active={active}
+      title={name}
+      value={volume}
+      onChange={setVolume}
+    />
+  </Container>
 )
 
 Zone.propTypes = {

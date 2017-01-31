@@ -1,36 +1,35 @@
 import React, { PropTypes } from 'react'
-import { StyleSheet, Text, View } from 'react-native'
+import styled from 'styled-components/native'
 import { connect } from 'react-redux'
 
-const styles = StyleSheet.create({
-  container: {
-    borderColor: 'white',
-    borderBottomWidth: 0.5,
-    paddingBottom: 15,
-  },
+const Container = styled.View`
+  padding-bottom: 15;
+  border-color: white;
+  border-bottom-width: 0.5;
+  margin: 25;
+`
 
-  text: {
-    color: 'white',
-    fontFamily: 'System',
-    fontSize: 16,
-    letterSpacing: 0.12,
-    lineHeight: 20,
-  },
+const Text = styled.Text`
+  color: white;
+  font-size: 16;
+  font-family: System;
+  letter-spacing: 0.12;
+  line-height: 20;
+`
 
-  artist: {
-    fontWeight: '500',
-  },
+const Artist = styled(Text)`
+  font-weight: 500;
+`
 
-  track: {
-    fontWeight: '100',
-  },
-})
+const Track = styled(Text)`
+  font-weight: 100;
+`
 
 const NowPlaying = ({ artist, track }) => (
-  <View style={styles.container}>
-    <Text style={[styles.text, styles.artist]}>{artist}</Text>
-    <Text style={[styles.text, styles.track]}>{track}</Text>
-  </View>
+  <Container>
+    <Artist>{artist}</Artist>
+    <Track>{track}</Track>
+  </Container>
 )
 
 NowPlaying.propTypes = {

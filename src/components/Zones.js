@@ -1,20 +1,18 @@
 import React, { PropTypes } from 'react'
-import { StyleSheet, View } from 'react-native'
+import styled from 'styled-components/native'
 import { connect } from 'react-redux'
 import { keys } from 'lodash'
 import Zone from './Zone'
 
-const styles = StyleSheet.create({
-  container: {
-    flexGrow: 1,
-    flexDirection: 'row',
-  },
-})
+const Container = styled.View`
+  flex-grow: 1;
+  flex-direction: row;
+`
 
 const Zones = ({ zones }) => (
-  <View style={styles.container}>
+  <Container>
     {zones.map(id => <Zone key={id} id={id} />)}
-  </View>
+  </Container>
 )
 
 Zones.propTypes = {
