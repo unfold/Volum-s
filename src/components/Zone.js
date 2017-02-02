@@ -2,8 +2,8 @@ import React, { Component, PropTypes } from 'react'
 import { Animated, PanResponder } from 'react-native'
 import styled from 'styled-components/native'
 import { connect } from 'react-redux'
+import { clamp } from 'lodash'
 import * as actions from '../actions'
-import { clamp, throttle } from 'lodash'
 
 const Container = styled.View`
   flex-grow: 1;
@@ -14,13 +14,16 @@ const Container = styled.View`
 const Track = styled.View`
   width: 100;
   flex-grow: 1;
-  background-color: grey;
 `
 
 const Thumb = styled(Animated.View)`
-  height: 100;
-  border-width: 1;
-  border-color: yellow;
+  align-items: center;
+  justify-content: space-between;
+`
+
+const Label = styled.View`
+  opacity: ${props => (props.dragging ? 1 : 0)};
+  align-items: center;
 `
 
 const Dot = styled.View`
@@ -29,13 +32,12 @@ const Dot = styled.View`
   border-width: 0.5;
   border-color: white;
   border-radius: 5;
+  background-color: ${props => (props.dragging ? 'white' : 'transparent')};
 `
 
 const Text = styled.Text`
   color: white;
 `
-
-const getValue = animatedValue => animatedValue.__getValue() // eslint-disable-line no-underscore-dangle
 
 class Slider extends Component {
   static propTypes = {
@@ -47,8 +49,6 @@ class Slider extends Component {
     maximumValue: PropTypes.number,
 
     onChange: PropTypes.func.isRequired,
-    onPress: PropTypes.func,
-    onRelease: PropTypes.func,
   }
 
   static defaultProps = {
@@ -71,7 +71,8 @@ class Slider extends Component {
     this.value = new Animated.Value(props.value)
 
     this.state = {
-      thumbHeight: 100,
+      dragging: false,
+      thumbHeight: 80,
       trackHeight: 0,
     }
   }
@@ -86,33 +87,23 @@ class Slider extends Component {
 
   onPress = () => {
     this.previousValue = this.props.value
-    //this.value.setOffset(this.props.value)
-    //this.value.setValue(0)
-    /*
-    const { value } = this.state
-
-    value.setOffset(getValue(value))
-    value.setValue(0)
-    */
-
-    // onPress(value.__getValue())
+    this.setState({ dragging: true })
   }
 
   onMove = (event, gestureState) => {
     const { thumbHeight, trackHeight } = this.state
     const { minimumValue, maximumValue } = this.props
-    const inputRange = trackHeight - thumbHeight
-    const nextValue = clamp((this.previousValue - gestureState.dy) / inputRange, minimumValue, maximumValue)
 
-    console.log(nextValue)
+    const inputRange = trackHeight - thumbHeight
+    const offsetY = this.previousValue * inputRange
+    const positionY = offsetY - gestureState.dy
+    const nextValue = clamp(positionY / inputRange, minimumValue, maximumValue)
 
     this.value.setValue(nextValue)
   }
 
   onRelease = () => {
-    this.value.flattenOffset()
-
-    // onRelease(value.__getValue())
+    this.setState({ dragging: false })
   }
 
   onTrackLayout = ({ nativeEvent }) => {
@@ -121,7 +112,7 @@ class Slider extends Component {
 
   render() {
     const { minimumValue, maximumValue, title, value } = this.props
-    const { thumbHeight, trackHeight } = this.state
+    const { dragging, thumbHeight, trackHeight } = this.state
 
     const label = Math.round(value * 100)
     const translateY = this.value.interpolate({
@@ -131,15 +122,18 @@ class Slider extends Component {
     })
 
     const style = {
+      height: thumbHeight,
       transform: [{ translateY }],
     }
 
     return (
       <Track onLayout={this.onTrackLayout} {...this.panResponder.panHandlers}>
         <Thumb style={style}>
-          <Text>{title}</Text>
-          <Text>{label}</Text>
-          <Dot />
+          <Label dragging={dragging}>
+            <Text>{title}</Text>
+            <Text>{label}</Text>
+          </Label>
+          <Dot dragging={dragging} />
         </Thumb>
       </Track>
     )
@@ -168,7 +162,6 @@ Zone.propTypes = {
 const mapStateToProps = ({ zones }, { id }) => ({ ...zones[id] })
 const mapDispatchToProps = (dispatch, { id }) => ({
   setActive: active => dispatch(actions.setActive(id, active)),
-  //setVolume: throttle(volume => dispatch(actions.setVolume(id, volume)), 250, { leading: false }),
   setVolume: volume => dispatch(actions.setVolume(id, volume)),
 })
 

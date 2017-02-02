@@ -5,18 +5,14 @@ export const SET_VOLUME = 'SET_VOLUME'
 
 const config = (state = {
   host: '192.168.1.140',
-}, action => {
-  return state
-})
+}) => state
 
 const playing = (state = {
   artist: 'Orchestral Manoeuvres in the Dark',
   album: 'Orchestral Manoeuvres in the Dark',
   track: 'Pretending To See The Future',
   coverImageUrl: 'http://fillmurray.com/300/300',
-}, action) => {
-  return state
-}
+}) => state
 
 const zones = (state = {
   ZONE1: {
@@ -31,7 +27,6 @@ const zones = (state = {
     volume: 0,
   },
 }, action) => {
-
   switch (action.type) {
     case SET_ACTIVE:
       // return update(state, [action.zone, 'active'], action.active)
