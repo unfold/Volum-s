@@ -1,11 +1,24 @@
 import { combineReducers } from 'redux'
+import createAsyncActionTypes from '../utils/createAsyncActionTypes'
 
+export const FIND_HOST = 'FIND_HOST'
 export const SET_ACTIVE = 'SET_ACTIVE'
 export const SET_VOLUME = 'SET_VOLUME'
 
 const config = (state = {
-  host: '192.168.1.140',
-}) => state
+  host: null,
+}, action) => {
+  const { successType } = createAsyncActionTypes(FIND_HOST)
+
+  switch (action.type) {
+    case successType:
+      return {
+        host: action.host,
+      }
+    default:
+      return state
+  }
+}
 
 const playing = (state = {
   artist: 'Orchestral Manoeuvres in the Dark',

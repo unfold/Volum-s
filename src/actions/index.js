@@ -1,13 +1,18 @@
 import * as api from '../utils/api'
-import { SET_ACTIVE, SET_VOLUME } from '../reducers'
+import { FIND_HOST, SET_ACTIVE, SET_VOLUME } from '../reducers'
+import createAsyncActionTypes from '../utils/createAsyncActionTypes'
 
 const getHost = state => state.config.host
 
-const createAsyncActionTypes = type => ({
-  requestType: type,
-  successType: `${type}_SUCCESS`,
-  failureType: `${type}_FAILURE`,
-})
+export const findHost = () => dispatch => {
+  const { requestType, successType, failureType } = createAsyncActionTypes(FIND_HOST)
+
+  dispatch({ type: requestType })
+
+  api.findHost()
+    .then(({ host }) => dispatch({ type: successType, host }))
+    .catch(error => dispatch({ type: failureType, error }))
+}
 
 export const setActive = (zone, active) => (dispatch, getState) => {
   const { requestType, successType, failureType } = createAsyncActionTypes(SET_ACTIVE)

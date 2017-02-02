@@ -1,4 +1,5 @@
 import parseXML from 'xml-parser'
+import Zeroconf from 'react-native-zeroconf'
 import { trim } from 'lodash'
 import request from './request'
 
@@ -39,6 +40,28 @@ export const sendCommand = (host, zone, command, argument) => {
 
   return request({ url, data, method: 'POST' })
     .then(response => response.text())
+}
+
+export const findHost = () => {
+  const scan = new Promise((resolve, reject) => {
+    // dns-sd -B _airplay._tcp .
+    const type = 'googlecast'
+    const scanner = new Zeroconf()
+    scanner.on('resolved', result => {
+      scanner.stop()
+
+      resolve(result)
+    })
+
+    scanner.on('error', reject)
+    scanner.scan(type)
+  })
+
+  const timeout = new Promise((resolve, reject) => (
+    setTimeout(() => reject(new Error('Timeout')), 60 * 1000)
+  ))
+
+  return Promise.race([scan, timeout])
 }
 
 export const setVolume = (host, zone, volume) =>
