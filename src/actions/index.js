@@ -1,7 +1,5 @@
 import * as api from '../utils/api'
-
-const SET_ACTIVE = 'SET_ACTIVE'
-const SET_VOLUME = 'SET_VOLUME'
+import { SET_ACTIVE, SET_VOLUME } from '../reducers'
 
 const getHost = state => state.config.host
 

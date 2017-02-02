@@ -46,7 +46,7 @@ class Slider extends Component {
     minimumValue: PropTypes.number,
     maximumValue: PropTypes.number,
 
-    onChange: PropTypes.func,
+    onChange: PropTypes.func.isRequired,
     onPress: PropTypes.func,
     onRelease: PropTypes.func,
   }
@@ -59,9 +59,6 @@ class Slider extends Component {
   constructor(props) {
     super(props)
 
-    this.value = new Animated.Value(props.value)
-    this.value.addListener(props.onChange)
-
     this.panResponder = PanResponder.create({
       onStartShouldSetPanResponder: () => !this.props.disabled, // Should we become active when pressed?
       onPanResponderGrant: this.onPress,
@@ -71,38 +68,49 @@ class Slider extends Component {
       onPanResponderTerminate: this.onRelease,
     })
 
+    this.value = new Animated.Value(props.value)
+
     this.state = {
-      value: new Animated.Value(props.value),
       thumbHeight: 100,
       trackHeight: 0,
     }
   }
 
+  componentWillMount() {
+    this.valueListenerId = this.value.addListener(event => this.props.onChange(event.value))
+  }
+
+  componentWillUnmount() {
+    this.value.removeListener(this.valueListenerId)
+  }
+
   onPress = () => {
+    this.previousValue = this.props.value
+    //this.value.setOffset(this.props.value)
+    //this.value.setValue(0)
+    /*
     const { value } = this.state
 
     value.setOffset(getValue(value))
     value.setValue(0)
+    */
 
     // onPress(value.__getValue())
   }
 
-  onMove = (event, { dy }) => {
-    const { thumbHeight, trackHeight, value } = this.state
+  onMove = (event, gestureState) => {
+    const { thumbHeight, trackHeight } = this.state
     const { minimumValue, maximumValue } = this.props
-    const nextValue = clamp((dy / (trackHeight - thumbHeight)) - value._offset, minimumValue, maximumValue)
+    const inputRange = trackHeight - thumbHeight
+    const nextValue = clamp((this.previousValue - gestureState.dy) / inputRange, minimumValue, maximumValue)
 
-    value.setValue(nextValue)
+    console.log(nextValue)
 
-    this.setState({ value })
-
-    // onChange(nextValue)
+    this.value.setValue(nextValue)
   }
 
   onRelease = () => {
-    const { value } = this.state
-
-    value.flattenOffset()
+    this.value.flattenOffset()
 
     // onRelease(value.__getValue())
   }
@@ -112,13 +120,13 @@ class Slider extends Component {
   }
 
   render() {
-    const { minimumValue, maximumValue, title } = this.props
-    const { thumbHeight, trackHeight, value } = this.state
+    const { minimumValue, maximumValue, title, value } = this.props
+    const { thumbHeight, trackHeight } = this.state
 
-    const label = Math.round(getValue(value) * 100)
-    const translateY = value.interpolate({
+    const label = Math.round(value * 100)
+    const translateY = this.value.interpolate({
       inputRange: [minimumValue, maximumValue],
-      outputRange: [0, trackHeight - thumbHeight],
+      outputRange: [trackHeight - thumbHeight, 0],
       extrapolate: 'clamp',
     })
 
@@ -160,7 +168,8 @@ Zone.propTypes = {
 const mapStateToProps = ({ zones }, { id }) => ({ ...zones[id] })
 const mapDispatchToProps = (dispatch, { id }) => ({
   setActive: active => dispatch(actions.setActive(id, active)),
-  setVolume: throttle(volume => dispatch(actions.setVolume(id, volume)), 250, { leading: false }),
+  //setVolume: throttle(volume => dispatch(actions.setVolume(id, volume)), 250, { leading: false }),
+  setVolume: volume => dispatch(actions.setVolume(id, volume)),
 })
 
 export default connect(mapStateToProps, mapDispatchToProps)(Zone)

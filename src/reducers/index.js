@@ -1,5 +1,8 @@
 import { combineReducers } from 'redux'
 
+export const SET_ACTIVE = 'SET_ACTIVE'
+export const SET_VOLUME = 'SET_VOLUME'
+
 const config = (state = {
   host: '192.168.1.140',
 }, action => {
@@ -25,10 +28,32 @@ const zones = (state = {
   ZONE2: {
     active: true,
     name: 'Workspace',
-    volume: 0.5,
+    volume: 0,
   },
 }, action) => {
-  return state
+
+  switch (action.type) {
+    case SET_ACTIVE:
+      // return update(state, [action.zone, 'active'], action.active)
+      return {
+        ...state,
+        [action.zone]: {
+          ...state[action.zone],
+          active: action.active,
+        },
+      }
+    case SET_VOLUME:
+      // return update(state, [action.zone, 'volume'], action.volume)
+      return {
+        ...state,
+        [action.zone]: {
+          ...state[action.zone],
+          volume: action.volume,
+        },
+      }
+    default:
+      return state
+  }
 }
 
 export default combineReducers({
