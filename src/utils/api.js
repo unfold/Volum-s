@@ -1,6 +1,6 @@
 import parseXML from 'xml-parser'
 import Zeroconf from 'react-native-zeroconf'
-import { trim } from 'lodash'
+import { includes, trim } from 'lodash'
 import request from './request'
 
 const MIN_VOLUME = -80
@@ -37,6 +37,7 @@ export const sendCommand = (host, zone, command, argument) => {
   }
 
   console.log(`Sending command: ${command}(${argument}) to ${zone}`)
+  console.log(url)
 
   return request({ url, data, method: 'POST' })
     .then(response => response.text())
@@ -44,13 +45,16 @@ export const sendCommand = (host, zone, command, argument) => {
 
 export const findHost = () => {
   const scan = new Promise((resolve, reject) => {
-    // dns-sd -B _airplay._tcp .
-    const type = 'googlecast'
+    const type = 'airplay'
     const scanner = new Zeroconf()
-    scanner.on('resolved', result => {
-      scanner.stop()
 
-      resolve(result)
+    // TODO: Stop scan on timeout
+    scanner.on('resolved', result => {
+      if (includes(result.name, 'Denon')) {
+        scanner.stop()
+
+        resolve(result)
+      }
     })
 
     scanner.on('error', reject)
