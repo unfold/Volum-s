@@ -2,7 +2,7 @@ import React, { Component, PropTypes } from 'react'
 import { Animated, PanResponder } from 'react-native'
 import styled from 'styled-components/native'
 import { connect } from 'react-redux'
-import { clamp } from 'lodash'
+import { clamp, throttle } from 'lodash'
 import * as actions from '../actions'
 
 const Container = styled.View`
@@ -78,7 +78,11 @@ class Slider extends Component {
   }
 
   componentWillMount() {
-    this.valueListenerId = this.value.addListener(event => this.props.onChange(event.value))
+    // https://facebook.github.io/react-native/docs/animations.html#responding-to-the-current-animation-value
+    this.valueListenerId = this.value.addListener(({ value }) => {
+      this.currentValue = value
+      this.props.onChange(value)
+    })
   }
 
   componentWillUnmount() {
@@ -111,10 +115,10 @@ class Slider extends Component {
   }
 
   render() {
-    const { minimumValue, maximumValue, title, value } = this.props
+    const { minimumValue, maximumValue, title } = this.props
     const { dragging, thumbHeight, trackHeight } = this.state
 
-    const label = Math.round(value * 100)
+    const label = Math.round(this.currentValue * 100)
     const translateY = this.value.interpolate({
       inputRange: [minimumValue, maximumValue],
       outputRange: [trackHeight - thumbHeight, 0],
@@ -162,7 +166,7 @@ Zone.propTypes = {
 const mapStateToProps = ({ zones }, { id }) => ({ ...zones[id] })
 const mapDispatchToProps = (dispatch, { id }) => ({
   setActive: active => dispatch(actions.setActive(id, active)),
-  setVolume: volume => dispatch(actions.setVolume(id, volume)),
+  setVolume: throttle(volume => dispatch(actions.setVolume(id, volume)), 250, { leading: false }),
 })
 
 export default connect(mapStateToProps, mapDispatchToProps)(Zone)
