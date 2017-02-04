@@ -11,7 +11,7 @@ export const findHost = () => dispatch => {
 
   api.findHost()
     .then(({ host }) => dispatch({ type: successType, host }))
-    .catch(error => dispatch({ type: failureType, error }))
+    .catch(error => dispatch({ type: failureType, error: error.message }))
 }
 
 export const setActive = (zone, active) => (dispatch, getState) => {
@@ -22,7 +22,7 @@ export const setActive = (zone, active) => (dispatch, getState) => {
 
   api.setActive(host, zone, active)
     .then(() => dispatch({ type: successType, zone, active }))
-    .catch(error => dispatch({ type: failureType, zone, active, error }))
+    .catch(error => dispatch({ type: failureType, zone, active, error: error.message }))
 }
 
 export const setVolume = (zone, volume) => (dispatch, getState) => {
@@ -33,5 +33,5 @@ export const setVolume = (zone, volume) => (dispatch, getState) => {
 
   api.setVolume(host, zone, volume)
     .then(() => dispatch({ type: successType, zone, volume }))
-    .catch(error => dispatch({ type: failureType, zone, volume, error }))
+    .catch(error => dispatch({ type: failureType, zone, volume, error: error.message }))
 }
