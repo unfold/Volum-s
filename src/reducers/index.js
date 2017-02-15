@@ -2,6 +2,8 @@ import { combineReducers } from 'redux'
 import createAsyncActionTypes from '../utils/createAsyncActionTypes'
 
 export const FIND_HOST = 'FIND_HOST'
+export const FETCH_NOW_PLAYING = 'FETCH_NOW_PLAYING'
+export const FETCH_STATUS = 'FETCH_STATUS'
 export const SET_ACTIVE = 'SET_ACTIVE'
 export const SET_VOLUME = 'SET_VOLUME'
 
@@ -21,11 +23,20 @@ const config = (state = {
 }
 
 const playing = (state = {
-  artist: 'Orchestral Manoeuvres in the Dark',
-  album: 'Orchestral Manoeuvres in the Dark',
-  track: 'Pretending To See The Future',
-  coverImageUrl: 'http://fillmurray.com/300/300',
-}) => state
+  artist: null,
+  album: null,
+  track: null,
+  artworkUrl: null,
+}, action) => {
+  const { successType } = createAsyncActionTypes(FETCH_NOW_PLAYING)
+
+  switch (action.type) {
+    case successType:
+      return action.playing
+    default:
+      return state
+  }
+}
 
 const zones = (state = {
   ZONE1: {

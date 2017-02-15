@@ -1,5 +1,5 @@
 import * as api from '../utils/api'
-import { FIND_HOST, SET_ACTIVE, SET_VOLUME } from '../reducers'
+import { FIND_HOST, FETCH_STATUS, FETCH_NOW_PLAYING, SET_ACTIVE, SET_VOLUME } from '../reducers'
 import createAsyncActionTypes from '../utils/createAsyncActionTypes'
 
 const getHost = state => state.config.host
@@ -11,6 +11,28 @@ export const findHost = () => dispatch => {
 
   api.findHost()
     .then(({ host }) => dispatch({ type: successType, host }))
+    .catch(error => dispatch({ type: failureType, error: error.message }))
+}
+
+export const fetchStatus = zone => (dispatch, getState) => {
+  const { requestType, successType, failureType } = createAsyncActionTypes(FETCH_STATUS)
+  const host = getHost(getState())
+
+  dispatch({ type: requestType, zone })
+
+  api.fetchStatus(host, zone)
+    .then(status => dispatch({ type: successType, zone, status }))
+    .catch(error => dispatch({ type: failureType, zone, error: error.message }))
+}
+
+export const fetchNowPlaying = () => (dispatch, getState) => {
+  const { requestType, successType, failureType } = createAsyncActionTypes(FETCH_NOW_PLAYING)
+  const host = getHost(getState())
+
+  dispatch({ type: requestType })
+
+  api.fetchNowPlaying(host)
+    .then(playing => dispatch({ type: successType, playing }))
     .catch(error => dispatch({ type: failureType, error: error.message }))
 }
 
