@@ -1,45 +1,78 @@
-import React, { PropTypes } from 'react'
+import React, { Component, PropTypes } from 'react'
 import styled from 'styled-components/native'
 import { connect } from 'react-redux'
+import * as actions from '../actions'
 
 const Container = styled.View`
-  padding-bottom: 15;
-  border-color: white;
-  border-bottom-width: 0.5;
+  flex-grow: 0.5;
+`
+
+const Overlay = styled.View`
+  flex-grow: 1;
+  justify-content: flex-end;
   margin: 25;
 `
 
 const Text = styled.Text`
   color: white;
-  font-size: 16;
   font-family: System;
   letter-spacing: 0.12;
-  line-height: 20;
-`
-
-const Artist = styled(Text)`
-  font-weight: 500;
+  background-color: transparent;
 `
 
 const Track = styled(Text)`
-  font-weight: 100;
+  font-size: 30;
+  font-weight: 300;
+  line-height: 30;
 `
 
-const NowPlaying = ({ artist, track }) => (
-  <Container>
-    <Artist>{artist}</Artist>
-    <Track>{track}</Track>
-  </Container>
-)
+const Artist = styled(Text)`
+  font-size: 16;
+  font-weight: 200;
+  line-height: 16;
+`
 
-NowPlaying.propTypes = {
-  artist: PropTypes.string,
-  track: PropTypes.string,
+const Artwork = styled.Image`
+  flex-grow: 1;
+  resizeMode: cover;
+`
+
+class NowPlaying extends Component {
+  static propTypes = {
+    artist: PropTypes.string,
+    track: PropTypes.string,
+    artworkUrl: PropTypes.string,
+    fetchNowPlaying: PropTypes.func.isRequired,
+  }
+
+  componentDidMount() {
+    this.props.fetchNowPlaying()
+  }
+
+  render() {
+    const { artist, track, artworkUrl } = this.props
+
+    if (!artworkUrl) {
+      return null
+    }
+
+    return (
+      <Container>
+        <Artwork source={{ uri: artworkUrl }}>
+          <Overlay>
+            <Track>{track}</Track>
+            <Artist>{artist}</Artist>
+          </Overlay>
+        </Artwork>
+      </Container>
+    )
+  }
 }
 
-const mapStateToProps = ({ playing }) => ({
-  artist: playing.artist,
-  track: playing.track,
+
+const mapStateToProps = ({ playing }) => playing
+const mapDispatchToProps = dispatch => ({
+  fetchNowPlaying: () => dispatch(actions.fetchNowPlaying()),
 })
 
-export default connect(mapStateToProps)(NowPlaying)
+export default connect(mapStateToProps, mapDispatchToProps)(NowPlaying)

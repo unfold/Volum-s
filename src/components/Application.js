@@ -11,13 +11,6 @@ const Container = styled.View`
   background-color: black;
 `
 
-const Host = styled.Text`
-  margin: 5;
-  font-size: 12;
-  color: white;
-  text-align: center;
-`
-
 class Application extends Component {
   static propTypes = {
     host: PropTypes.string,
@@ -29,13 +22,12 @@ class Application extends Component {
   }
 
   render() {
-    const { host = 'No host found' } = this.props
+    const { host } = this.props
 
     return (
       <Container>
-        <NowPlaying />
-        <Zones />
-        <Host>Host: {host}</Host>
+        { host && <NowPlaying /> }
+        { host && <Zones /> }
       </Container>
     )
   }

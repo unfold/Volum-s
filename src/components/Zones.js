@@ -5,7 +5,7 @@ import { keys } from 'lodash'
 import Zone from './Zone'
 
 const Container = styled.View`
-  flex-grow: 1;
+  flex-grow: 0.5;
   flex-direction: row;
 `
 

@@ -103,7 +103,7 @@ export const fetchStatus = (host, zone = 'ZONE1') => {
     .then(result => ({
       name: result.RenameZone,
       volume: normalizeVolume(result.MasterVolume),
-      active: result.ZonePower === 'ON',
+      active: result.ZonePower,
     }))
 }
 

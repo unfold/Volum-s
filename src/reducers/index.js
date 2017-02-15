@@ -52,6 +52,14 @@ const zones = (state = {
   },
 }, action) => {
   switch (action.type) {
+    case 'FETCH_STATUS_SUCCESS':
+      return {
+        ...state,
+        [action.zone]: {
+          ...state[action.zone],
+          ...action.status,
+        },
+      }
     case SET_ACTIVE:
       // return update(state, [action.zone, 'active'], action.active)
       return {
