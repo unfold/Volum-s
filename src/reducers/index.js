@@ -1,6 +1,7 @@
 import { combineReducers } from 'redux'
 import createAsyncActionTypes from '../utils/createAsyncActionTypes'
 
+export const LOAD_CONFIG = 'LOAD_CONFIG'
 export const FIND_HOST = 'FIND_HOST'
 export const SET_ACTIVE = 'SET_ACTIVE'
 export const SET_VOLUME = 'SET_VOLUME'
@@ -8,11 +9,15 @@ export const SET_VOLUME = 'SET_VOLUME'
 const config = (state = {
   host: null,
 }, action) => {
-  const { successType } = createAsyncActionTypes(FIND_HOST)
+  const { successType: loadConfigSuccessType } = createAsyncActionTypes(LOAD_CONFIG)
+  const { successType: findHostSuccessType } = createAsyncActionTypes(FIND_HOST)
 
   switch (action.type) {
-    case successType:
+    case loadConfigSuccessType:
+      return action.config
+    case findHostSuccessType:
       return {
+        ...state,
         host: action.host,
       }
     default:
