@@ -71,20 +71,16 @@ export default class extends Component {
     }
   }
 
-  componentWillMount() {
+  componentDidMount() {
     // https://facebook.github.io/react-native/docs/animations.html#responding-to-the-current-animation-value
     this.valueListenerId = this.value.addListener(({ value }) => {
       this.currentValue = value
-
-      if (this.props.onChange) {
-        this.props.onChange(value)
-      }
     })
   }
 
   componentWillReceiveProps(nextProps) {
     if (!this.state.dragging) {
-      this.value.setValue(nextProps.value)
+      Animated.spring(this.value, { toValue: nextProps.value }).start()
     }
   }
 
@@ -93,17 +89,19 @@ export default class extends Component {
   }
 
   onPress = () => {
-    this.previousValue = this.currentValue
+    const { onPress, value } = this.props
+
+    this.previousValue = value
     this.setState({ dragging: true })
 
-    if (this.props.onPress) {
-      this.props.onPress(this.currentValue)
+    if (onPress) {
+      onPress(value)
     }
   }
 
   onMove = (event, gestureState) => {
     const { thumbHeight, trackHeight } = this.state
-    const { minimumValue, maximumValue } = this.props
+    const { minimumValue, maximumValue, onChange } = this.props
 
     const inputRange = trackHeight - thumbHeight
     const offsetY = this.previousValue * inputRange
@@ -111,13 +109,17 @@ export default class extends Component {
     const nextValue = clamp(positionY / inputRange, minimumValue, maximumValue)
 
     this.value.setValue(nextValue)
+
+    onChange(nextValue)
   }
 
   onRelease = () => {
+    const { onRelease, value } = this.props
+
     this.setState({ dragging: false })
 
-    if (this.props.onRelease) {
-      this.props.onRelease(this.currentValue)
+    if (onRelease) {
+      onRelease(value)
     }
   }
 
