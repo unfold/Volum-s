@@ -1,4 +1,5 @@
 import parseXML from 'xml-parser'
+import htmlEntities from 'he'
 import { AsyncStorage } from 'react-native'
 import Zeroconf from 'react-native-zeroconf'
 import { includes, trim } from 'lodash'
@@ -31,7 +32,7 @@ const transformValue = value => {
     return true
   }
 
-  return trim(value)
+  return htmlEntities.decode(htmlEntities.decode(trim(value)))
 }
 
 const transformChildren = children => children.map(child => transformValue(child.content))

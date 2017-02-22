@@ -40,7 +40,9 @@ export default class extends Component {
     minimumValue: PropTypes.number,
     maximumValue: PropTypes.number,
 
-    onChange: PropTypes.func.isRequired,
+    onPress: PropTypes.func,
+    onChange: PropTypes.func,
+    onRelease: PropTypes.func,
   }
 
   static defaultProps = {
@@ -73,12 +75,17 @@ export default class extends Component {
     // https://facebook.github.io/react-native/docs/animations.html#responding-to-the-current-animation-value
     this.valueListenerId = this.value.addListener(({ value }) => {
       this.currentValue = value
-      this.props.onChange(value)
+
+      if (this.props.onChange) {
+        this.props.onChange(value)
+      }
     })
   }
 
   componentWillReceiveProps(nextProps) {
-    this.value.setValue(nextProps.value)
+    if (!this.state.dragging) {
+      this.value.setValue(nextProps.value)
+    }
   }
 
   componentWillUnmount() {
@@ -86,8 +93,12 @@ export default class extends Component {
   }
 
   onPress = () => {
-    this.previousValue = this.props.value
+    this.previousValue = this.currentValue
     this.setState({ dragging: true })
+
+    if (this.props.onPress) {
+      this.props.onPress(this.currentValue)
+    }
   }
 
   onMove = (event, gestureState) => {
@@ -104,6 +115,10 @@ export default class extends Component {
 
   onRelease = () => {
     this.setState({ dragging: false })
+
+    if (this.props.onRelease) {
+      this.props.onRelease(this.currentValue)
+    }
   }
 
   onTrackLayout = ({ nativeEvent }) => {

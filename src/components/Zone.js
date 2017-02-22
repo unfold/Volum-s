@@ -6,6 +6,8 @@ import * as actions from '../actions'
 
 import Slider from './Slider'
 
+const REFRESH_DELAY = 1e3
+
 const Container = styled.View`
   flex-grow: 1;
   align-items: center;
@@ -14,7 +16,15 @@ const Container = styled.View`
 
 class Zone extends Component {
   componentDidMount() {
-    this.props.fetchStatus()
+    const { fetchStatus } = this.props
+
+    this.timerId = setInterval(fetchStatus, REFRESH_DELAY)
+
+    fetchStatus()
+  }
+
+  componentWillUnmount() {
+    clearTimeout(this.timerId)
   }
 
   render() {
@@ -23,7 +33,7 @@ class Zone extends Component {
     return (
       <Container>
         <Slider
-          active={active}
+          disabled={!active}
           title={name}
           value={volume}
           onChange={setVolume}
@@ -45,7 +55,7 @@ Zone.propTypes = {
 const mapStateToProps = ({ zones }, { id }) => ({ ...zones[id] })
 const mapDispatchToProps = (dispatch, { id }) => ({
   fetchStatus: () => dispatch(actions.fetchStatus(id)),
-  setActive: active => dispatch(actions.setActive(id, active)),
+  // setActive: active => dispatch(actions.setActive(id, active)),
   setVolume: throttle(volume => dispatch(actions.setVolume(id, volume)), 250, { leading: false }),
 })
 

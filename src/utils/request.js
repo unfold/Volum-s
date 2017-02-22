@@ -29,6 +29,6 @@ export default ({
   }
 
   return fetch(finalUrl, options).then(response => (
-    response.ok ? response : Promise.reject(response))
+    response.ok ? response : Promise.reject(response)),
   )
 }

@@ -1,20 +1,9 @@
 import { compose, createStore, applyMiddleware } from 'redux'
-//import { composeWithDevTools } from 'remote-redux-devtools'
 import thunk from 'redux-thunk'
 import reducers from '../reducers'
 
-let enhancer;
-if (process.env.NODE_ENV === 'production') {
-  enhancer = applyMiddleware(thunk);
-} else {
-  enhancer = compose(
-    applyMiddleware(thunk),
-    devTools()
-  );
-}
-
-const composeEnhancers = __DEV__ ? require('remote-redux-devtools').composeWithDevTools : compose
-const enhancer = composeWithDevTools(applyMiddleware(thunk))
+const composeEnhancers = __DEV__ ? require('remote-redux-devtools').composeWithDevTools : compose // eslint-disable-line import/newline-after-import, import/no-extraneous-dependencies
+const enhancer = composeEnhancers(applyMiddleware(thunk))
 
 export default () => {
   const store = createStore(reducers, enhancer)

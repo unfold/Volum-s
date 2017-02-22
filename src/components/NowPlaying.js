@@ -3,6 +3,8 @@ import styled from 'styled-components/native'
 import { connect } from 'react-redux'
 import * as actions from '../actions'
 
+const REFRESH_DELAY = 2e3
+
 const Container = styled.View`
   flex-grow: 0.5;
 `
@@ -34,7 +36,6 @@ const Artist = styled(Text)`
 
 const Artwork = styled.Image`
   flex-grow: 1;
-  resizeMode: cover;
 `
 
 class NowPlaying extends Component {
@@ -46,7 +47,15 @@ class NowPlaying extends Component {
   }
 
   componentDidMount() {
-    this.props.fetchNowPlaying()
+    const { fetchNowPlaying } = this.props
+
+    this.timerId = setInterval(fetchNowPlaying, REFRESH_DELAY)
+
+    fetchNowPlaying()
+  }
+
+  componentWillUnmount() {
+    clearTimeout(this.timerId)
   }
 
   render() {
@@ -68,7 +77,6 @@ class NowPlaying extends Component {
     )
   }
 }
-
 
 const mapStateToProps = ({ playing }) => playing
 const mapDispatchToProps = dispatch => ({
