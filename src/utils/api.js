@@ -1,8 +1,9 @@
 import parseXML from 'xml-parser'
 import htmlEntities from 'he'
+import md5 from 'md5'
 import { AsyncStorage } from 'react-native'
 import Zeroconf from 'react-native-zeroconf'
-import { includes, trim } from 'lodash'
+import { compact, includes, trim } from 'lodash'
 import request from './request'
 
 const CONFIG_KEY = 'config'
@@ -18,6 +19,12 @@ const normalizeVolume = value => (
 const denormalizeVolume = value => (
   Math.round((value * (MAX_VOLUME - MIN_VOLUME)) + MIN_VOLUME)
 )
+
+const getArtworkUrl = (host, details) => {
+  const id = md5(compact(details).join(''))
+
+  return `http://${host}/NetAudio/art.asp-jpg?id=${id}`
+}
 
 const transformValue = value => {
   if (!value) {
@@ -121,6 +128,6 @@ export const fetchNowPlaying = host => {
       artist: result.szLine[2],
       album: result.szLine[4],
       source: result.NetPlayingTitle,
-      artworkUrl: result.Art === '2' ? `http://${host}/NetAudio/art.asp-jpg` : null,
+      artworkUrl: result.Art === '2' ? getArtworkUrl(host, result.szLine) : null,
     }))
 }
