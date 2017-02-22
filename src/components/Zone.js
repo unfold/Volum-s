@@ -6,7 +6,7 @@ import * as actions from '../actions'
 
 import Slider from './Slider'
 
-const REFRESH_DELAY = 1e3
+const REFRESH_DELAY = 2500
 
 const Container = styled.View`
   flex-grow: 1;

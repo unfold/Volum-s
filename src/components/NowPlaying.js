@@ -3,7 +3,7 @@ import styled from 'styled-components/native'
 import { connect } from 'react-redux'
 import * as actions from '../actions'
 
-const REFRESH_DELAY = 2e3
+const REFRESH_DELAY = 2500
 
 const Container = styled.View`
   flex-grow: 0.5;
