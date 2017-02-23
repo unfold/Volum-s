@@ -1,18 +1,38 @@
 import React, { Component, PropTypes } from 'react'
+import Svg, { Defs, Rect, LinearGradient, Stop } from 'react-native-svg'
+
 import styled from 'styled-components/native'
 import { connect } from 'react-redux'
 import * as actions from '../actions'
 
 const REFRESH_DELAY = 2500
 
+const OverlayBackground = () => (
+  <Svg style={{ flexGrow: 1 }}>
+    <Defs>
+      <LinearGradient id="gradient" x2="0" y2="100%">
+        <Stop offset="0" stopColor="black" stopOpacity="0" />
+        <Stop offset="1" stopColor="black" stopOpacity="1" />
+      </LinearGradient>
+    </Defs>
+
+    <Rect width="100%" height="100%" fill="url(#gradient)" />
+  </Svg>
+)
+
+const Overlay = styled.View`
+  flex-grow: 1;
+`
+
 const Container = styled.View`
   flex-grow: 0.5;
 `
 
-const Overlay = styled.View`
-  flex-grow: 1;
-  justify-content: flex-end;
-  margin: 25;
+const OverlayContent = styled.View`
+  position: absolute;
+  bottom: 25;
+  left: 25;
+  right: 25;
 `
 
 const Text = styled.Text`
@@ -69,8 +89,12 @@ class NowPlaying extends Component {
       <Container>
         <Artwork source={{ uri: artworkUrl }}>
           <Overlay>
-            <Track>{track}</Track>
-            <Artist>{artist}</Artist>
+            <OverlayBackground />
+
+            <OverlayContent>
+              <Track>{track}</Track>
+              <Artist>{artist}</Artist>
+            </OverlayContent>
           </Overlay>
         </Artwork>
       </Container>
