@@ -7,18 +7,9 @@ import * as actions from '../actions'
 
 const REFRESH_DELAY = 2500
 
-const OverlayBackground = () => (
-  <Svg style={{ flexGrow: 1 }}>
-    <Defs>
-      <LinearGradient id="gradient" x2="0" y2="100%">
-        <Stop offset="0" stopColor="black" stopOpacity="0" />
-        <Stop offset="1" stopColor="black" stopOpacity="1" />
-      </LinearGradient>
-    </Defs>
-
-    <Rect width="100%" height="100%" fill="url(#gradient)" />
-  </Svg>
-)
+const OverlayBackground = styled(Svg)`
+  flex-grow: 1;
+`
 
 const Overlay = styled.View`
   flex-grow: 1;
@@ -89,7 +80,16 @@ class NowPlaying extends Component {
       <Container>
         <Artwork source={{ uri: artworkUrl }}>
           <Overlay>
-            <OverlayBackground />
+            <OverlayBackground>
+              <Defs>
+                <LinearGradient id="gradient" x2="0" y2="100%">
+                  <Stop offset="0" stopColor="black" stopOpacity="0" />
+                  <Stop offset="1" stopColor="black" stopOpacity="1" />
+                </LinearGradient>
+              </Defs>
+
+              <Rect width="100%" height="100%" fill="url(#gradient)" />
+            </OverlayBackground>
 
             <OverlayContent>
               <Track>{track}</Track>
